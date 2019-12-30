@@ -1,8 +1,23 @@
 <html>
     <head>
         <title>Lorikeet</title>
+        <link rel="stylesheet" href="app.css" />
+        <script src="app.js"></script>
     </head>
     <body>
-        <h1>Welcome to Lorikeet</h1>
+        <template id="item-template">
+            <div class="item">
+                <img class="icon" />
+                <div class="filename"></div>
+            </div>
+        </template>
+        <div id="toolbar">
+            <div id="current-folder">
+                <script>
+                    document.write(getUserHomeFolder());
+                </script>
+            </div>
+        </div>
+        <div id="main-area"></div>
     </body>
 </html>
