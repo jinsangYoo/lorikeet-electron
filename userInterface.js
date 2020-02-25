@@ -1,14 +1,22 @@
-'use strict';
+"use strict";
 
 let document;
-const fileSystem = require('./fileSystem');
+const fileSystem = require("./fileSystem");
 
 function displayFolderPath(folderPath) {
-  document.getElementById('current-folder').innerText = folderPath;
+  document.getElementById("up").addEventListener(
+    "click",
+    () => {
+      let folderPath = fileSystem.getUserHomeFolder();
+      loadDirectory(folderPath)(window);
+    },
+    false
+  );
+  document.getElementById("current-folder").innerText = folderPath;
 }
 
 function clearView() {
-  const mainArea = document.getElementById('main-area');
+  const mainArea = document.getElementById("main-area");
   let firstChild = mainArea.firstChild;
   while (firstChild) {
     mainArea.removeChild(firstChild);
@@ -17,7 +25,7 @@ function clearView() {
 }
 
 function loadDirectory(folderPath) {
-  return function (window) {
+  return function(window) {
     if (!document) {
       document = window.document;
     }
@@ -25,7 +33,7 @@ function loadDirectory(folderPath) {
     fileSystem.getFilesInFolder(folderPath, (err, files) => {
       clearView();
       if (err) {
-        return alert('Sorry, you could not load your folder.');
+        return alert("Sorry, you could not load your folder.");
       }
       fileSystem.inspectAndDescribeFiles(folderPath, files, displayFiles);
     });
@@ -33,23 +41,27 @@ function loadDirectory(folderPath) {
 }
 
 function displayFile(file) {
-  const mainArea = document.getElementById('main-area');
-  const template = document.querySelector('#item-template');
+  const mainArea = document.getElementById("main-area");
+  const template = document.querySelector("#item-template");
   let clone = document.importNode(template.content, true);
-  clone.querySelector('img').src = `images/${file.type}.svg`;
+  clone.querySelector("img").src = `images/${file.type}.svg`;
 
-  if (file.type === 'directory') {
-    clone.querySelector('img').addEventListener('dblclick', () => {
-      loadDirectory(file.path)();
-    }, false);
+  if (file.type === "directory") {
+    clone.querySelector("img").addEventListener(
+      "dblclick",
+      () => {
+        loadDirectory(file.path)();
+      },
+      false
+    );
   }
-  clone.querySelector('.filename').innerText = file.file;
+  clone.querySelector(".filename").innerText = file.file;
   mainArea.appendChild(clone);
 }
 
 function displayFiles(err, files) {
   if (err) {
-    return alert('Sorry, we could not display your files.');
+    return alert("Sorry, we could not display your files.");
   }
 
   files.forEach(displayFile);

@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-const async = require('async');
-const fs = require('fs');
-const osenv = require('osenv');
-const path = require('path');
+const async = require("async");
+const fs = require("fs");
+const osenv = require("osenv");
+const path = require("path");
 
 function getUserHomeFolder() {
   return osenv.home();
@@ -17,7 +17,7 @@ function inspectAndDescribeFile(filePath, cb) {
   let result = {
     file: path.basename(filePath),
     path: filePath,
-    type: ''
+    type: ""
   };
 
   fs.stat(filePath, (err, stat) => {
@@ -25,10 +25,10 @@ function inspectAndDescribeFile(filePath, cb) {
       cb(err);
     } else {
       if (stat.isFile()) {
-        result.type = 'file';
+        result.type = "file";
       }
       if (stat.isDirectory()) {
-        result.type = 'directory';
+        result.type = "directory";
       }
       cb(err, result);
     }
@@ -36,10 +36,14 @@ function inspectAndDescribeFile(filePath, cb) {
 }
 
 function inspectAndDescribeFiles(folderPath, files, cb) {
-  async.map(files, (file, asyncCb) => {
-    let resolvedFilePath = path.resolve(folderPath, file);
-    inspectAndDescribeFile(resolvedFilePath, asyncCb);
-  }, cb);
+  async.map(
+    files,
+    (file, asyncCb) => {
+      let resolvedFilePath = path.resolve(folderPath, file);
+      inspectAndDescribeFile(resolvedFilePath, asyncCb);
+    },
+    cb
+  );
 }
 
 module.exports = {

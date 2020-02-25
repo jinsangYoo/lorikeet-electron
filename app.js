@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-const fileSystem = require('./fileSystem');
-const userInterface = require('./userInterface');
+const fileSystem = require("./fileSystem");
+const userInterface = require("./userInterface");
 
 function main() {
   userInterface.bindDocument(window);
