@@ -10,7 +10,7 @@ body {
   width: 100%;
   z-index: 2;
 }
-#up {
+#home {
   float: left;
   color: white;
   background: rgba(1, 1, 1, 0.2);
@@ -28,6 +28,15 @@ body {
   border-radius: 0.2em;
   margin: 1em;
 }
+#search {
+  float: right;
+  padding: 0.5em;
+  min-width: 10em;
+  border-radius: 3em;
+  margin: 2em 1em;
+  border: none;
+  outline: none;
+}
 #main-area {
   clear: both;
   margin: 2em;
@@ -39,8 +48,8 @@ body {
   float: left;
   padding: 1em;
   margin: 1em;
-  width: 6em;
-  height: 6em;
+  width: 2em;
+  height: 2em;
   text-align: center;
 }
 .item .filename {
