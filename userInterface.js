@@ -1,9 +1,41 @@
 "use strict";
 
+let $ = require("jquery");
+const path = require("path");
+
 let document;
 const fileSystem = require("./fileSystem");
 const search = require("./search");
-let $ = require("jquery");
+
+function convertFolderPathIntoLinks(folderPath) {
+  const folders = folderPath.split(path.sep);
+  const contents = [];
+  let pathAtFolder = "";
+  folders.forEach(folder => {
+    console.log(`folder: ${folder}`);
+    pathAtFolder += folder + path.sep;
+    contents.push(
+      `<span class='path' data-path='${pathAtFolder.slice(
+        0,
+        -1
+      )}'>${folder}</span>`
+    );
+  });
+
+  return contents.join(path.sep).toString();
+}
+
+function bindCurrentFolderPath() {
+  const load = event => {
+    const folderPath = event.target.getAttribute("data-path");
+    loadDirectory(folderPath)();
+  };
+
+  const paths = document.getElementsByClassName("path");
+  for (let i = 0; i < paths.length; i++) {
+    paths[i].addEventListener("click", load, false);
+  }
+}
 
 function bindSearchField(cb) {
   document.getElementById("search").addEventListener("keyup", cb, false);
@@ -84,7 +116,10 @@ function displayFile(file) {
 }
 
 function displayFolderPath(folderPath) {
-  document.getElementById("current-folder").innerText = folderPath;
+  document.getElementById(
+    "current-folder"
+  ).innerHTML = convertFolderPathIntoLinks(folderPath);
+  bindCurrentFolderPath();
 }
 
 function displayFiles(err, files) {
