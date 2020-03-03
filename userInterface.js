@@ -110,8 +110,22 @@ function displayFile(file) {
       },
       false
     );
+    clone.querySelector(".filename").addEventListener(
+      "dblclick",
+      () => {
+        loadDirectory(file.path)();
+      },
+      false
+    );
   } else {
     clone.querySelector("img").addEventListener(
+      "dblclick",
+      () => {
+        fileSystem.openFile(file.path);
+      },
+      false
+    );
+    clone.querySelector(".filename").addEventListener(
       "dblclick",
       () => {
         fileSystem.openFile(file.path);

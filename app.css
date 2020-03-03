@@ -40,21 +40,24 @@ body {
 #main-area {
   clear: both;
   margin: 2em;
-  margin-top: 3em;
+  margin-top: 5em;
   z-index: 1;
 }
 .item {
   position: relative;
   float: left;
-  padding: 1em;
-  margin: 1em;
-  width: 2em;
+  width: 30em;
   height: 2em;
-  text-align: center;
+  text-align: left;
 }
 .item .filename {
-  padding-top: 1em;
+  padding: 0.5em;
+  margin-left: 2em;
   font-size: 10pt;
+}
+.item .icon {
+  width: 5%;
+  float: left;
 }
 span.path:hover,
 img:hover {
