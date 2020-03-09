@@ -165,6 +165,20 @@ function bindDocument(window) {
     },
     false
   );
+  document.getElementById("open").addEventListener(
+    "click",
+    () => {
+      loadDirectory(__dirname)();
+    },
+    false
+  );
+  document.getElementById("startBtn").addEventListener(
+    "click",
+    () => {
+      alert("시작");
+    },
+    false
+  );
 }
 
 module.exports = {

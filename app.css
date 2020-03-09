@@ -19,11 +19,20 @@ body {
   border-radius: 0.2em;
   margin: 1em;
 }
+#open {
+  float: left;
+  color: white;
+  background: rgba(1, 1, 1, 0.2);
+  padding: 0.5em;
+  min-width: 1em;
+  border-radius: 0.2em;
+  margin: 1em 0em;
+}
 #current-folder {
   float: left;
   color: white;
   background: rgba(0, 0, 0, 0.2);
-  padding: 0.5em 1em;
+  padding: 0.5em;
   min-width: 10em;
   border-radius: 0.2em;
   margin: 1em;
@@ -36,6 +45,13 @@ body {
   margin: 2em 1em;
   border: none;
   outline: none;
+}
+#startBtn {
+  float: right;
+  padding: 0.5em;
+  min-width: 5em;
+  min-height: 5em;
+  margin: 2em 1em;
 }
 #main-area {
   clear: both;
