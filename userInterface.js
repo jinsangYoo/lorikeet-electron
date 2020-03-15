@@ -2,6 +2,7 @@
 
 let $ = require("jquery");
 const path = require("path");
+const remote = require("electron").remote;
 
 let document;
 const fileSystem = require("./fileSystem");
@@ -165,10 +166,25 @@ function bindDocument(window) {
     },
     false
   );
-  document.getElementById("open").addEventListener(
+  document.getElementById("current").addEventListener(
     "click",
     () => {
       loadDirectory(__dirname)();
+    },
+    false
+  );
+  const fullscreen = document.getElementById("fullscreen");
+  fullscreen.addEventListener(
+    "click",
+    () => {
+      const win = remote.getCurrentWindow();
+      if (win.isFullScreen()) {
+        win.setFullScreen(false);
+        fullscreen.innerText = "Go full screen";
+      } else {
+        win.setFullScreen(true);
+        fullscreen.innerText = "Exit full screen";
+      }
     },
     false
   );
@@ -180,6 +196,8 @@ function bindDocument(window) {
     false
   );
 }
+
+function toggleFollScreen() {}
 
 module.exports = {
   bindDocument,
