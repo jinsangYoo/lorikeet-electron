@@ -257,7 +257,9 @@ function bindDocument(window) {
 
 function doneWhenInspectForAceLogFile(err, resultParsingFiles) {
   if (err) {
-    return alert("Sorry, we could not display your files.");
+    alert("Sorry, we could not display your files.");
+    updateValidateButtonText("Start");
+    return;
   }
 
   resultParsingFiles.forEach(displayForAceLogFile);
