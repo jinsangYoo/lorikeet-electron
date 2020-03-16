@@ -1,11 +1,9 @@
 "use strict";
 
-const async = require("async");
-
 const fileSystem = require("./fileSystem");
 const userInterface = require("./userInterface");
 
-function start(folderPath) {
+function start(folderPath, cb) {
   console.log(`folderPath: ${folderPath}`);
 
   fileSystem.getFilesInFolder(folderPath, (err, files) => {
@@ -14,20 +12,8 @@ function start(folderPath) {
       return alert("Sorry, you could not load your folder.");
     }
     console.log(`files.length: ${files.length}`);
-    fileSystem.inspectAndAceLogFiles(folderPath, files, doneWhenDisplay);
+    fileSystem.inspectAndAceLogFiles(folderPath, files, cb);
   });
-}
-
-function doneWhenDisplay(err, resultParsingFiles) {
-  if (err) {
-    return alert("Sorry, we could not display your files.");
-  }
-
-  resultParsingFiles.forEach(displayFile);
-}
-
-function displayFile(file) {
-  console.log(file);
 }
 
 module.exports = {

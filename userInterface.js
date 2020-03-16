@@ -208,7 +208,7 @@ function bindDocument(window) {
     () => {
       let currentFolderInnerText = document.getElementById("current-folder")
         .innerText;
-      console.log(`file.path: ${currentFolderInnerText}`);
+      // console.log(`file.path: ${currentFolderInnerText}`);
       fileSystem.openFile(currentFolderInnerText);
     },
     false
@@ -248,14 +248,29 @@ function bindDocument(window) {
     () => {
       let currentFolderInnerText = document.getElementById("current-folder")
         .innerText;
-      // console.log(`current-folder: ${currentFolderInnerText}`);
-      logValidator.start(currentFolderInnerText);
+      logValidator.start(currentFolderInnerText, doneWhenInspectForAceLogFile);
+      updateValidateButtonText("Prodcessing");
     },
     false
   );
 }
 
-function toggleFollScreen() {}
+function doneWhenInspectForAceLogFile(err, resultParsingFiles) {
+  if (err) {
+    return alert("Sorry, we could not display your files.");
+  }
+
+  resultParsingFiles.forEach(displayForAceLogFile);
+  updateValidateButtonText("Start");
+}
+
+function displayForAceLogFile(file) {
+  console.log(file);
+}
+
+function updateValidateButtonText(text) {
+  document.getElementById("startBtn").value = text;
+}
 
 module.exports = {
   bindDocument,

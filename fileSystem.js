@@ -60,17 +60,16 @@ function inspectAndAceLogFile(filePath, cb) {
     json: null
   };
 
-  console.log(`result: ${result}`);
   const fileReader = fs.createReadStream(filePath, { encoding: "utf8" });
+  var chunk = [];
   fileReader.on("data", data => {
-    console.log(`data::data: ${data}`);
+    chunk.push(data);
   });
-  fileReader.on("end", (err, data) => {
+  fileReader.on("end", err => {
     if (err) {
       cb(err);
     } else {
-      console.log(`end::data: ${data}`);
-      result.json = JSON.parse(data);
+      result.json = JSON.parse(chunk.join(""));
       cb(err, result);
     }
   });
