@@ -62,6 +62,13 @@ function getLogsFolderPath() {
   return contents.join(path.sep).toString();
 }
 
+function getSampleFolderPath() {
+  let contents = convertFolderPathIntoLinkArrayForParentFolder(__dirname);
+  contents.push("getherServer");
+  contents.push("sample");
+  return contents.join(path.sep).toString();
+}
+
 function bindCurrentFolderPath() {
   const load = event => {
     const folderPath = event.target.getAttribute("data-path");
@@ -195,15 +202,7 @@ function bindDocument(window) {
     document = window.document;
   }
 
-  document.getElementById("home").addEventListener(
-    "click",
-    () => {
-      let folderPath = fileSystem.getUserHomeFolder();
-      loadDirectory(folderPath)();
-    },
-    false
-  );
-  document.getElementById("open").addEventListener(
+  document.getElementById("file").addEventListener(
     "click",
     () => {
       let currentFolderInnerText = document.getElementById("current-folder")
@@ -225,6 +224,14 @@ function bindDocument(window) {
     () => {
       let logsFolderPath = getLogsFolderPath();
       loadDirectory(logsFolderPath)();
+    },
+    false
+  );
+  document.getElementById("sample").addEventListener(
+    "click",
+    () => {
+      let sampleFolderPath = getSampleFolderPath();
+      loadDirectory(sampleFolderPath)();
     },
     false
   );

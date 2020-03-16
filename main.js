@@ -51,9 +51,9 @@ function createWindow() {
   appIcon.setContextMenu(contextMenu);
   // 브라우저 창을 생성합니다.
   mainWindow = new BrowserWindow({
-    width: 1000,
+    width: 1100,
     height: 600,
-    minWidth: 800,
+    minWidth: 1100,
     minHeight: 600,
     webPreferences: {
       nodeIntegration: true
