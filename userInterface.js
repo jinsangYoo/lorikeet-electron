@@ -166,6 +166,16 @@ function bindDocument(window) {
     },
     false
   );
+  document.getElementById("open").addEventListener(
+    "click",
+    () => {
+      let currentFolderInnerText = document.getElementById("current-folder")
+        .innerText;
+      console.log(`file.path: ${currentFolderInnerText}`);
+      fileSystem.openFile(currentFolderInnerText);
+    },
+    false
+  );
   document.getElementById("current").addEventListener(
     "click",
     () => {

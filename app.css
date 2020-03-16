@@ -14,7 +14,7 @@ body {
   float: left;
   color: white;
   background: rgba(1, 1, 1, 0.2);
-  padding: 0.5em 1em;
+  padding: 0.5em;
   min-width: 1em;
   border-radius: 0.2em;
   margin: 1em 0.5em;
@@ -23,10 +23,21 @@ body {
   float: left;
   color: white;
   background: rgba(1, 1, 1, 0.2);
-  padding: 0.5em 1em;
+  padding: 0.5em;
+  min-width: 1em;
+  border-radius: 0.2em;
+  margin: 1em 0em;
+  text-align: center;
+}
+#open {
+  float: left;
+  color: white;
+  background: rgba(1, 1, 1, 0.2);
+  padding: 0.5em;
   min-width: 1em;
   border-radius: 0.2em;
   margin: 1em 0.5em;
+  text-align: center;
 }
 #current {
   float: left;
