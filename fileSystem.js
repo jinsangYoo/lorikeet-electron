@@ -65,11 +65,26 @@ function inspectAndAceLogFile(filePath, cb) {
   fileReader.on("data", data => {
     chunk.push(data);
   });
+  fileReader.on("error", err => {
+    cb(err);
+  });
   fileReader.on("end", err => {
     if (err) {
       cb(err);
     } else {
-      result.json = JSON.parse(chunk.join(""));
+      try {
+        result.json = JSON.parse(chunk.join(""));
+      } catch (e) {
+        if (e instanceof SyntaxError) {
+          printError(e, true);
+        } else {
+          printError(e, false);
+        }
+
+        cb(e);
+        return;
+      }
+
       cb(err, result);
     }
   });
@@ -88,6 +103,12 @@ function inspectAndAceLogFiles(folderPath, files, cb) {
 
 function openFile(filePath) {
   shell.openItem(filePath);
+}
+
+function printError(error, explicit) {
+  console.log(
+    `[${explicit ? "EXPLICIT" : "INEXPLICIT"}] ${error.name}: ${error.message}`
+  );
 }
 
 module.exports = {
