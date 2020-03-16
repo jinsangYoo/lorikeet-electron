@@ -7,13 +7,13 @@ const remote = require("electron").remote;
 let document;
 const fileSystem = require("./fileSystem");
 const search = require("./search");
+const logValidator = require("./logValidator");
 
 function convertFolderPathIntoLinks(folderPath) {
   const folders = folderPath.split(path.sep);
   const contents = [];
   let pathAtFolder = "";
   folders.forEach(folder => {
-    console.log(`folder: ${folder}`);
     pathAtFolder += folder + path.sep;
     contents.push(
       `<span class='path' data-path='${pathAtFolder.slice(
@@ -23,6 +23,42 @@ function convertFolderPathIntoLinks(folderPath) {
     );
   });
 
+  return contents.join(path.sep).toString();
+}
+
+function convertFolderPathIntoLinkArrayForParentFolder(folderPath) {
+  const currentFolderName = path.basename(folderPath);
+  const folderNameArray = folderPath.match(new RegExp(currentFolderName, "g"));
+  var currentFolderNameCount = folderNameArray.length;
+
+  const folders = folderPath.split(path.sep);
+  const contents = [];
+
+  folders.forEach(folder => {
+    if (
+      folder.localeCompare(currentFolderName) == 0 &&
+      currentFolderNameCount > 0
+    ) {
+      --currentFolderNameCount;
+    }
+
+    if (currentFolderNameCount > 0) {
+      contents.push(folder);
+    }
+  });
+  return contents;
+}
+
+function convertFolderPathIntoLinksForParentFolder(folderPath) {
+  return convertFolderPathIntoLinkArrayForParentFolder(folderPath)
+    .join(path.sep)
+    .toString();
+}
+
+function getLogsFolderPath() {
+  let contents = convertFolderPathIntoLinkArrayForParentFolder(__dirname);
+  contents.push("getherServer");
+  contents.push("logs");
   return contents.join(path.sep).toString();
 }
 
@@ -84,6 +120,7 @@ function loadDirectory(folderPath) {
     }
     search.resetIndex();
     displayFolderPath(folderPath);
+
     fileSystem.getFilesInFolder(folderPath, (err, files) => {
       clearView();
       if (err) {
@@ -183,6 +220,14 @@ function bindDocument(window) {
     },
     false
   );
+  document.getElementById("logs").addEventListener(
+    "click",
+    () => {
+      let logsFolderPath = getLogsFolderPath();
+      loadDirectory(logsFolderPath)();
+    },
+    false
+  );
   const fullscreen = document.getElementById("fullscreen");
   fullscreen.addEventListener(
     "click",
@@ -201,7 +246,10 @@ function bindDocument(window) {
   document.getElementById("startBtn").addEventListener(
     "click",
     () => {
-      alert("시작");
+      let currentFolderInnerText = document.getElementById("current-folder")
+        .innerText;
+      // console.log(`current-folder: ${currentFolderInnerText}`);
+      logValidator.start(currentFolderInnerText);
     },
     false
   );

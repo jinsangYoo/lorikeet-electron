@@ -53,6 +53,40 @@ function inspectAndDescribeFiles(folderPath, files, cb) {
   );
 }
 
+function inspectAndAceLogFile(filePath, cb) {
+  let result = {
+    file: path.basename(filePath),
+    path: filePath,
+    json: null
+  };
+
+  console.log(`result: ${result}`);
+  const fileReader = fs.createReadStream(filePath, { encoding: "utf8" });
+  fileReader.on("data", data => {
+    console.log(`data::data: ${data}`);
+  });
+  fileReader.on("end", (err, data) => {
+    if (err) {
+      cb(err);
+    } else {
+      console.log(`end::data: ${data}`);
+      result.json = JSON.parse(data);
+      cb(err, result);
+    }
+  });
+}
+
+function inspectAndAceLogFiles(folderPath, files, cb) {
+  async.map(
+    files,
+    (file, asyncCb) => {
+      let resolvedFilePath = path.resolve(folderPath, file);
+      inspectAndAceLogFile(resolvedFilePath, asyncCb);
+    },
+    cb
+  );
+}
+
 function openFile(filePath) {
   shell.openItem(filePath);
 }
@@ -61,5 +95,6 @@ module.exports = {
   getUserHomeFolder,
   getFilesInFolder,
   inspectAndDescribeFiles,
+  inspectAndAceLogFiles,
   openFile
 };
