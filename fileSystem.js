@@ -16,6 +16,10 @@ function getUserHomeFolder() {
   return osenv.home();
 }
 
+function getCurrentFilePath() {
+  return __dirname;
+}
+
 function getFilesInFolder(folderPath, cb) {
   fs.readdir(folderPath, cb);
 }
@@ -116,5 +120,6 @@ module.exports = {
   getFilesInFolder,
   inspectAndDescribeFiles,
   inspectAndAceLogFiles,
-  openFile
+  openFile,
+  getCurrentFilePath
 };

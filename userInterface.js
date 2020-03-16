@@ -228,6 +228,7 @@ function bindDocument(window) {
     },
     false
   );
+
   const fullscreen = document.getElementById("fullscreen");
   fullscreen.addEventListener(
     "click",
@@ -243,6 +244,7 @@ function bindDocument(window) {
     },
     false
   );
+
   document.getElementById("startBtn").addEventListener(
     "click",
     () => {

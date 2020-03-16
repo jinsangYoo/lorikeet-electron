@@ -6,8 +6,8 @@ const search = require("./search");
 
 function main() {
   userInterface.bindDocument(window);
-  let folderPath = fileSystem.getUserHomeFolder();
-  userInterface.loadDirectory(folderPath)(window);
+  let currentFilePath = fileSystem.getCurrentFilePath();
+  userInterface.loadDirectory(currentFilePath)(window);
   userInterface.bindSearchField(event => {
     // console.log("============S");
     // console.log(event);
