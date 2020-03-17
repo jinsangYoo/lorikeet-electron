@@ -9,6 +9,8 @@ const fileSystem = require("./fileSystem");
 const search = require("./search");
 const logValidator = require("./logValidator");
 
+//#region Common
+//#region Util-Path
 function convertFolderPathIntoLinks(folderPath) {
   const folders = folderPath.split(path.sep);
   const contents = [];
@@ -68,135 +70,11 @@ function getSampleFolderPath() {
   contents.push("sample");
   return contents.join(path.sep).toString();
 }
+//#endregion
+//#endregion
 
-function bindCurrentFolderPath() {
-  const load = event => {
-    const folderPath = event.target.getAttribute("data-path");
-    loadDirectory(folderPath)();
-  };
-
-  const paths = document.getElementsByClassName("path");
-  for (let i = 0; i < paths.length; i++) {
-    paths[i].addEventListener("click", load, false);
-  }
-}
-
-function bindSearchField(cb) {
-  document.getElementById("search").addEventListener("keyup", cb, false);
-}
-
-function filterResults(results) {
-  const validFilePaths = results.map(result => {
-    return result.ref;
-  });
-  const items = document.getElementsByClassName("item");
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    let filePath = item
-      .getElementsByTagName("img")[0]
-      .getAttribute("data-filepath");
-    if (validFilePaths.indexOf(filePath) !== -1) {
-      item.style = null;
-    } else {
-      item.style = "display:none;";
-    }
-  }
-}
-
-function resetFilter() {
-  const items = document.getElementsByClassName("item");
-  for (let i = 0; i < items.length; i++) {
-    items[i].style = null;
-  }
-}
-
-function clearView() {
-  // console.log("clearView");
-  const mainArea = document.getElementById("main-area");
-  let firstChild = mainArea.firstChild;
-  while (firstChild) {
-    mainArea.removeChild(firstChild);
-    firstChild = mainArea.firstChild;
-  }
-}
-
-function loadDirectory(folderPath) {
-  return function(window) {
-    if (!document) {
-      document = window.document;
-    }
-    search.resetIndex();
-    displayFolderPath(folderPath);
-
-    fileSystem.getFilesInFolder(folderPath, (err, files) => {
-      clearView();
-      if (err) {
-        return alert("Sorry, you could not load your folder.");
-      }
-      // console.log(`files.length: ${files.length}`);
-      fileSystem.inspectAndDescribeFiles(folderPath, files, displayFiles);
-    });
-  };
-}
-
-function displayFile(file) {
-  const mainArea = document.getElementById("main-area");
-  const template = document.querySelector("#item-template");
-  let clone = document.importNode(template.content, true);
-  search.addToIndex(file);
-  clone.querySelector("img").src = `images/${file.type}.svg`;
-  clone.querySelector("img").setAttribute("data-filePath", file.path);
-
-  if (file.type === "directory") {
-    clone.querySelector("img").addEventListener(
-      "dblclick",
-      () => {
-        loadDirectory(file.path)();
-      },
-      false
-    );
-    clone.querySelector(".filename").addEventListener(
-      "dblclick",
-      () => {
-        loadDirectory(file.path)();
-      },
-      false
-    );
-  } else {
-    clone.querySelector("img").addEventListener(
-      "dblclick",
-      () => {
-        fileSystem.openFile(file.path);
-      },
-      false
-    );
-    clone.querySelector(".filename").addEventListener(
-      "dblclick",
-      () => {
-        fileSystem.openFile(file.path);
-      },
-      false
-    );
-  }
-  clone.querySelector(".filename").innerText = file.file;
-  mainArea.appendChild(clone);
-}
-
-function displayFolderPath(folderPath) {
-  document.getElementById(
-    "current-folder"
-  ).innerHTML = convertFolderPathIntoLinks(folderPath);
-  bindCurrentFolderPath();
-}
-
-function displayFiles(err, files) {
-  if (err) {
-    return alert("Sorry, we could not display your files.");
-  }
-
-  files.forEach(displayFile);
-}
-
+//#region GUI
+//#region init/bind
 function bindDocument(window) {
   if (!document) {
     document = window.document;
@@ -263,6 +141,148 @@ function bindDocument(window) {
     false
   );
 }
+//#endregion
+
+//#region CurrentFolderPath
+function bindCurrentFolderPath() {
+  const load = event => {
+    const folderPath = event.target.getAttribute("data-path");
+    loadDirectory(folderPath)();
+  };
+
+  const paths = document.getElementsByClassName("path");
+  for (let i = 0; i < paths.length; i++) {
+    paths[i].addEventListener("click", load, false);
+  }
+}
+
+function displayFolderPath(folderPath) {
+  document.getElementById(
+    "current-folder"
+  ).innerHTML = convertFolderPathIntoLinks(folderPath);
+  bindCurrentFolderPath();
+}
+//#endregion
+
+//#region SearchField
+function bindSearchField(cb) {
+  document.getElementById("search").addEventListener("keyup", cb, false);
+}
+
+function filterResults(results) {
+  const validFilePaths = results.map(result => {
+    return result.ref;
+  });
+  const items = document.getElementsByClassName("item");
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    let filePath = item
+      .getElementsByTagName("img")[0]
+      .getAttribute("data-filepath");
+    if (validFilePaths.indexOf(filePath) !== -1) {
+      item.style = null;
+    } else {
+      item.style = "display:none;";
+    }
+  }
+}
+
+function resetFilter() {
+  const items = document.getElementsByClassName("item");
+  for (let i = 0; i < items.length; i++) {
+    items[i].style = null;
+  }
+}
+//#endregion
+
+//#region file/directory
+function clearView() {
+  // console.log("clearView");
+  const mainArea = document.getElementById("main-area");
+  let firstChild = mainArea.firstChild;
+  while (firstChild) {
+    mainArea.removeChild(firstChild);
+    firstChild = mainArea.firstChild;
+  }
+}
+
+function loadDirectory(folderPath) {
+  return function(window) {
+    if (!document) {
+      document = window.document;
+    }
+    search.resetIndex();
+    displayFolderPath(folderPath);
+
+    fileSystem.getFilesInFolder(folderPath, (err, files) => {
+      clearView();
+      if (err) {
+        return alert("Sorry, you could not load your folder.");
+      }
+      // console.log(`files.length: ${files.length}`);
+      fileSystem.inspectAndDescribeFiles(folderPath, files, displayFiles);
+    });
+  };
+}
+
+function displayFiles(err, files) {
+  if (err) {
+    return alert("Sorry, we could not display your files.");
+  }
+
+  files.forEach(displayFile);
+}
+
+function displayFile(file) {
+  search.addToIndex(file);
+
+  const mainArea = document.getElementById("main-area");
+  const template = document.querySelector("#item-template");
+  var clone = document.importNode(template.content, true);
+  clone.querySelector("img").src = `images/${file.type}.svg`;
+  clone.querySelector("img").setAttribute("data-filePath", file.path);
+  clone.firstElementChild.setAttribute("data-fileName", file.file);
+
+  if (file.type === "directory") {
+    clone.querySelector("img").addEventListener(
+      "dblclick",
+      () => {
+        loadDirectory(file.path)();
+      },
+      false
+    );
+    clone.querySelector(".filename").addEventListener(
+      "dblclick",
+      () => {
+        loadDirectory(file.path)();
+      },
+      false
+    );
+  } else {
+    clone.querySelector("img").addEventListener(
+      "dblclick",
+      () => {
+        fileSystem.openFile(file.path);
+      },
+      false
+    );
+    clone.querySelector(".filename").addEventListener(
+      "dblclick",
+      () => {
+        fileSystem.openFile(file.path);
+      },
+      false
+    );
+  }
+  clone.querySelector(".filename").innerText = file.file;
+  mainArea.appendChild(clone);
+}
+//#endregion
+
+//#region validator
+function updateValidateButtonText(text) {
+  document.getElementById("startBtn").value = text;
+}
 
 function doneWhenInspectForAceLogFile(err, resultParsingFiles) {
   if (err) {
@@ -276,12 +296,29 @@ function doneWhenInspectForAceLogFile(err, resultParsingFiles) {
 }
 
 function displayForAceLogFile(file) {
-  console.log(file);
+  let divTag = $('div[data-fileName="' + file.file + '"]');
+  divTag.append(getDetailTag("json", file.json));
+  // console.log(divTag.html());
+  // console.log(getDetailTag("json", file.file).html());
+  // $('div[data-fileName="' + file.file + '"]').css("border", "3px solid red").;
 }
 
-function updateValidateButtonText(text) {
-  document.getElementById("startBtn").value = text;
+function getDetailTag(summary, content) {
+  let detailsTag = document.createElement("details");
+  let summaryTag = document.createElement("summary");
+  let preTag = document.createElement("pre");
+
+  $(summaryTag)
+    .text(summary)
+    .appendTo(detailsTag);
+  $(preTag)
+    .text(JSON.stringify(content, undefined, 2))
+    .appendTo(detailsTag);
+
+  return detailsTag;
 }
+//#endregion
+//#endregion
 
 module.exports = {
   bindDocument,
