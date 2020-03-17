@@ -291,16 +291,16 @@ function doneWhenInspectForAceLogFile(err, resultParsingFiles) {
     return;
   }
 
-  resultParsingFiles.forEach(inspectAndAceLogFiles);
+  resultParsingFiles.forEach(validate);
   updateValidateButtonText("Start");
 }
 
-function inspectAndAceLogFiles(file) {
+function validate(file) {
   //#region normal css,GUI
   displayForAceLogFile(file);
   //#endregion
 
-  logValidator.inspectAndAceLogFile(file, result => {
+  logValidator.validate(file, result => {
     console.log(`${file.file}::${result}::끝?`);
   });
 }

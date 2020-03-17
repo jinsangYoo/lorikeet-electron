@@ -16,12 +16,30 @@ function start(folderPath, cb) {
   });
 }
 
-function inspectAndAceLogFile(file, cb) {
+let validatorInfo = {};
+let validator = {
+  isFirstLog: (object, key) => {
+    console.log(`${key}::object.file :: ${object.file}`);
+    console.log(`${key}::object.json.vk :: ${object.json.vk}`);
+  },
+  hasLogSource: (object, key) => {
+    console.log(`${key}::object.file :: ${object.file}`);
+    console.log(`${key}::object.json.logsource :: ${object.json.logsource}`);
+  }
+};
+
+function validate(file, cb) {
   console.log(file);
+  initJSONObject(file);
+
+  Object.entries(validator).forEach(([key, value]) => value(file, key));
+
   cb("우하하");
 }
 
+function initJSONObject(file) {}
+
 module.exports = {
   start,
-  inspectAndAceLogFile
+  validate
 };
