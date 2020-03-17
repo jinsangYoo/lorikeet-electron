@@ -291,15 +291,24 @@ function doneWhenInspectForAceLogFile(err, resultParsingFiles) {
     return;
   }
 
-  resultParsingFiles.forEach(displayForAceLogFile);
+  resultParsingFiles.forEach(inspectAndAceLogFiles);
   updateValidateButtonText("Start");
+}
+
+function inspectAndAceLogFiles(file) {
+  //#region normal css,GUI
+  displayForAceLogFile(file);
+  //#endregion
+
+  logValidator.inspectAndAceLogFile(file, result => {
+    console.log(`${file.file}::${result}::끝?`);
+  });
 }
 
 function displayForAceLogFile(file) {
   let divTag = $('div[data-fileName="' + file.file + '"]');
   divTag.children("details").remove();
   divTag.append(getDetailTag("json", file.json));
-  // $('div[data-fileName="' + file.file + '"]').css("border", "3px solid red").;
 }
 
 function getDetailTag(summary, content) {

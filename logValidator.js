@@ -16,6 +16,12 @@ function start(folderPath, cb) {
   });
 }
 
+function inspectAndAceLogFile(file, cb) {
+  console.log(file);
+  cb("우하하");
+}
+
 module.exports = {
-  start
+  start,
+  inspectAndAceLogFile
 };
