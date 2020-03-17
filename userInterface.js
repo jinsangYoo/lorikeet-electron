@@ -297,17 +297,18 @@ function doneWhenInspectForAceLogFile(err, resultParsingFiles) {
 
 function displayForAceLogFile(file) {
   let divTag = $('div[data-fileName="' + file.file + '"]');
+  divTag.children("details").remove();
   divTag.append(getDetailTag("json", file.json));
-  // console.log(divTag.html());
-  // console.log(getDetailTag("json", file.file).html());
   // $('div[data-fileName="' + file.file + '"]').css("border", "3px solid red").;
 }
 
 function getDetailTag(summary, content) {
-  let detailsTag = document.createElement("details");
+  let detailsTag = $(document.createElement("details"));
   let summaryTag = document.createElement("summary");
   let preTag = document.createElement("pre");
 
+  detailsTag.css("border", "1px solid rgba(139, 233, 62, 0.466)");
+  detailsTag.css("background", "rgba(216, 228, 53, 0.2)");
   $(summaryTag)
     .text(summary)
     .appendTo(detailsTag);
