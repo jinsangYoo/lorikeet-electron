@@ -77,14 +77,14 @@ let validator = {
           isSameStartTsGetTs: startts.localeCompare(getts) == 0,
           //#endregion
           vk: isFirstVk(key, file.file, file.json.vk),
-          fileNmae: file.file
+          fileName: file.file
         },
         //#endregion
         needCheckFiles: [],
         //#region validator 진행과정에 발생 정보 저장
         processingInfo: {
           needCheck: false,
-          fileNmae: file.file,
+          fileName: file.file,
           debugMessages: []
         }
         //#endregion
@@ -92,6 +92,7 @@ let validator = {
     } else {
       let starttsObject = resultValidate[startts];
       let processingInfo = starttsObject.processingInfo;
+      processingInfo.fileName = file.file;
 
       let resultIsSameStartTsGetTs = startts.localeCompare(getts) == 0;
       if (resultIsSameStartTsGetTs) {
@@ -99,10 +100,6 @@ let validator = {
         processingInfo.debugMessages.push(
           `startts, getts가 같습니다. >>startts: ${startts}, getts: ${getts}, resultIsSameStartTsGetTs: ${resultIsSameStartTsGetTs}<<`
         );
-
-        if (!starttsObject.needCheck.includes(file.file)) {
-          starttsObject.needCheck.push(file.file);
-        }
       }
 
       let resultVK = isFirstVk(key, file.file, file.json.vk);
@@ -111,10 +108,6 @@ let validator = {
         processingInfo.debugMessages.push(
           `vk가 1입니다. >>vk: ${file.json.vk}<<`
         );
-
-        if (!starttsObject.needCheck.includes(file.file)) {
-          starttsObject.needCheck.push(file.file);
-        }
       }
     }
 
@@ -130,9 +123,31 @@ let validator = {
     console.log(`start::${key}`);
 
     console.log(`done::${key}::file.json.logsource :: ${file.json.logsource}`);
+  },
+
+  //#region require common last
+  finish: (file, key) => {
+    console.log(`start::${key}`);
+
+    let startts = getStartTS(key, file.file, file.json.st);
+    let starttsObject = resultValidate[startts];
+    if (starttsObject.processingInfo.needCheck) {
+      starttsObject.needCheckFiles.push(starttsObject.processingInfo);
+    }
+
+    delete starttsObject.processingInfo;
+    starttsObject.processingInfo = {
+      needCheck: false,
+      fileName: null,
+      debugMessages: []
+    };
+
+    console.log(`done::${key}`);
   }
+  //#endregion
 };
 
+//#region public method
 function validate(file, cb) {
   console.log(file);
   initJSONObject(file);
@@ -141,6 +156,7 @@ function validate(file, cb) {
 
   cb("우하하");
 }
+//#endregion
 
 function initJSONObject(file) {}
 
