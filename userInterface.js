@@ -291,17 +291,34 @@ function doneWhenInspectForAceLogFile(err, resultParsingFiles) {
     return;
   }
 
-  resultParsingFiles.forEach(validate);
+  // validate(resultParsingFiles, doneWhenValidate);
+  resultParsingFiles.forEach(validate1);
   updateValidateButtonText("Start");
 }
 
-function validate(file) {
-  //#region normal css,GUI
+function doneWhenValidate(err, resultParsingFiles) {}
+
+function validate(files) {
+  async.map(
+    files,
+    (file, asyncCb) => {
+      //#region add json
+      displayForAceLogFile(file);
+      //#endregion
+
+      logValidator.validate(file);
+    },
+    cb
+  );
+}
+
+function validate1(file) {
+  //#region add json
   displayForAceLogFile(file);
   //#endregion
 
-  logValidator.validate(file, result => {
-    console.log(`${file.file}::${result}::끝?`);
+  logValidator.validate(file, resultValidate => {
+    console.log(`${file.file}::${JSON.stringify(resultValidate)}`);
   });
 }
 

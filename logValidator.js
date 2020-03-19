@@ -3,8 +3,18 @@
 const fileSystem = require("./fileSystem");
 const userInterface = require("./userInterface");
 
+var _hasJson;
+var resultValidate;
 function start(folderPath, cb) {
   console.log(`folderPath: ${folderPath}`);
+  _hasJson = false;
+  resultValidate = {
+    common: {
+      hasNotJson: [],
+      parsingSequence: [],
+      needCheckFiles: []
+    }
+  };
 
   fileSystem.getFilesInFolder(folderPath, (err, files) => {
     // UI 업데이트 위치
@@ -16,13 +26,6 @@ function start(folderPath, cb) {
   });
 }
 
-var _hasJson = false;
-let resultValidate = {
-  common: {
-    hasNotJson: [],
-    parsingSequence: []
-  }
-};
 let validator = {
   //#region require common first
   hasJson: (file, key) => {
@@ -80,7 +83,9 @@ let validator = {
           fileName: file.file
         },
         //#endregion
-        needCheckFiles: [],
+
+        prev: file.json,
+
         //#region validator 진행과정에 발생 정보 저장
         processingInfo: {
           needCheck: false,
@@ -111,7 +116,7 @@ let validator = {
       }
     }
 
-    console.log(`done::${key}::${JSON.stringify(resultValidate[startts])}`);
+    // console.log(`done::${key}::${JSON.stringify(resultValidate[startts])}`);
     console.log(`done::${key}`);
   },
   //#endregion
@@ -125,6 +130,47 @@ let validator = {
     console.log(`done::${key}::file.json.logsource :: ${file.json.logsource}`);
   },
 
+  isValidRef: (file, key) => {
+    if (!hasJson()) {
+      return;
+    }
+    console.log(`start::${key}`);
+
+    let startts = getStartTS(key, file.file, file.json.st);
+    let starttsObject = resultValidate[startts];
+    let processingInfo = starttsObject.processingInfo;
+
+    if (!file.json.ref) {
+      processingInfo.needCheck = true;
+      processingInfo.debugMessages.push(
+        `ref 값 확인이 필요합니다. >>ref: ${file.json.ref}<<`
+      );
+    } else {
+      if (isFirstLog(key, file.file, file.json.st, file.json.vk)) {
+        console.log(`>>ref: ${file.json.ref}<<`);
+        if (file.json.ref.toLowerCase().localeCompare("bookmark") != 0) {
+          // console.log(`1.오류 확인 >>ref: ${file.json.ref}<<`);
+          processingInfo.needCheck = true;
+          processingInfo.debugMessages.push(
+            `로그가 최초 로그인데 ref가 bookmark가 아닙니다. >>ref: ${file.json.ref}<<`
+          );
+        }
+      } else {
+        if (
+          resultValidate[startts].prev.url.localeCompare(file.json.ref) != 0
+        ) {
+          // console.log(`2.오류 확인 >>ref: ${file.json.ref}<<`);
+          processingInfo.needCheck = true;
+          processingInfo.debugMessages.push(
+            `이전 로그의 url 이 이번 로그의 ref 값이 아닙니다. >>prev.url: ${resultValidate[startts].prev.url}, ref: ${file.json.ref}<<`
+          );
+        }
+      }
+    }
+
+    console.log(`done::${key}`);
+  },
+
   //#region require common last
   finish: (file, key) => {
     console.log(`start::${key}`);
@@ -132,7 +178,7 @@ let validator = {
     let startts = getStartTS(key, file.file, file.json.st);
     let starttsObject = resultValidate[startts];
     if (starttsObject.processingInfo.needCheck) {
-      starttsObject.needCheckFiles.push(starttsObject.processingInfo);
+      resultValidate.common.needCheckFiles.push(starttsObject.processingInfo);
     }
 
     delete starttsObject.processingInfo;
@@ -142,6 +188,10 @@ let validator = {
       debugMessages: []
     };
 
+    delete resultValidate[startts].prev;
+    resultValidate[startts].prev = file.json;
+
+    console.log(`done::${key}::${JSON.stringify(resultValidate[startts])}`);
     console.log(`done::${key}`);
   }
   //#endregion
@@ -150,15 +200,12 @@ let validator = {
 //#region public method
 function validate(file, cb) {
   console.log(file);
-  initJSONObject(file);
 
   Object.entries(validator).forEach(([key, value]) => value(file, key));
 
-  cb("우하하");
+  cb(resultValidate);
 }
 //#endregion
-
-function initJSONObject(file) {}
 
 //#region Validator Helper
 function getGetTS(key, fileName, st) {
@@ -187,6 +234,10 @@ function hasJson() {
   return _hasJson;
 }
 
+function isFirstLog(key, fileName, st, vk) {
+  return isSameStartTsGetTs(key, fileName, st) && isFirstVk(key, fileName, vk);
+}
+
 function isFirstVk(key, fileName, vk) {
   if (vk) {
     return vk.localeCompare("1") == 0;
@@ -194,6 +245,12 @@ function isFirstVk(key, fileName, vk) {
     console.log(`${key}::${fileName}::vk 문제가 있습니다.::${vk}`);
     return false;
   }
+}
+
+function isSameStartTsGetTs(key, fileName, st) {
+  let startts = getStartTS(key, fileName, st);
+  let getts = getGetTS(key, fileName, st);
+  return startts.localeCompare(getts) == 0;
 }
 //#endregion
 
