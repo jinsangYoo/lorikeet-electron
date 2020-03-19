@@ -84,7 +84,7 @@ let validator = {
         },
         //#endregion
 
-        prev: file.json,
+        prev: undefined,
 
         //#region validator 진행과정에 발생 정보 저장
         processingInfo: {
@@ -97,7 +97,13 @@ let validator = {
     } else {
       let starttsObject = resultValidate[startts];
       let processingInfo = starttsObject.processingInfo;
-      processingInfo.fileName = file.file;
+
+      delete starttsObject.processingInfo;
+      starttsObject.processingInfo = {
+        needCheck: false,
+        fileName: file.file,
+        debugMessages: []
+      };
 
       let resultIsSameStartTsGetTs = startts.localeCompare(getts) == 0;
       if (resultIsSameStartTsGetTs) {
@@ -156,14 +162,16 @@ let validator = {
           );
         }
       } else {
-        if (
-          resultValidate[startts].prev.url.localeCompare(file.json.ref) != 0
-        ) {
-          // console.log(`2.오류 확인 >>ref: ${file.json.ref}<<`);
-          processingInfo.needCheck = true;
-          processingInfo.debugMessages.push(
-            `이전 로그의 url 이 이번 로그의 ref 값이 아닙니다. >>prev.url: ${resultValidate[startts].prev.url}, ref: ${file.json.ref}<<`
-          );
+        if (isSiteInTp(key, file.file, file.json.tp)) {
+          if (
+            resultValidate[startts].prev.url.localeCompare(file.json.ref) != 0
+          ) {
+            // console.log(`2.오류 확인 >>ref: ${file.json.ref}<<`);
+            processingInfo.needCheck = true;
+            processingInfo.debugMessages.push(
+              `이전 로그의 url 이 이번 로그의 ref 값이 아닙니다. >>prev.url: ${resultValidate[startts].prev.url}, ref: ${file.json.ref}<<`
+            );
+          }
         }
       }
     }
@@ -181,13 +189,6 @@ let validator = {
       resultValidate.common.needCheckFiles.push(starttsObject.processingInfo);
     }
 
-    delete starttsObject.processingInfo;
-    starttsObject.processingInfo = {
-      needCheck: false,
-      fileName: null,
-      debugMessages: []
-    };
-
     delete resultValidate[startts].prev;
     resultValidate[startts].prev = file.json;
 
@@ -199,11 +200,11 @@ let validator = {
 
 //#region public method
 function validate(file, cb) {
-  console.log(file);
-
   Object.entries(validator).forEach(([key, value]) => value(file, key));
 
-  cb(resultValidate);
+  let startts = getStartTS("validate", file.file, file.json.st);
+  let starttsObject = resultValidate[startts];
+  cb(undefined, starttsObject.processingInfo);
 }
 //#endregion
 
@@ -251,6 +252,15 @@ function isSameStartTsGetTs(key, fileName, st) {
   let startts = getStartTS(key, fileName, st);
   let getts = getGetTS(key, fileName, st);
   return startts.localeCompare(getts) == 0;
+}
+
+function isSiteInTp(key, fileName, tp) {
+  if (tp) {
+    return tp.localeCompare("site") == 0;
+  } else {
+    console.log(`${key}::${fileName}::tp 문제가 있습니다.::${tp}`);
+    return false;
+  }
 }
 //#endregion
 

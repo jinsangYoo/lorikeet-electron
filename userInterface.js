@@ -2,6 +2,7 @@
 
 let $ = require("jquery");
 const path = require("path");
+const async = require("async");
 const remote = require("electron").remote;
 
 let document;
@@ -133,6 +134,7 @@ function bindDocument(window) {
   document.getElementById("startBtn").addEventListener(
     "click",
     () => {
+      clearNeedCheckFilesChildView();
       let currentFolderInnerText = document.getElementById("current-folder")
         .innerText;
       logValidator.start(currentFolderInnerText, doneWhenInspectForAceLogFile);
@@ -291,35 +293,47 @@ function doneWhenInspectForAceLogFile(err, resultParsingFiles) {
     return;
   }
 
-  // validate(resultParsingFiles, doneWhenValidate);
-  resultParsingFiles.forEach(validate1);
-  updateValidateButtonText("Start");
+  validate(resultParsingFiles, doneWhenValidate);
 }
 
-function doneWhenValidate(err, resultParsingFiles) {}
+function doneWhenValidate(err, processingInfos) {
+  updateValidateButtonText("Start");
+  if (err) {
+    alert("Sorry, we could not validate your files.");
+    return;
+  }
 
-function validate(files) {
+  console.log(`검증 완료::${JSON.stringify(processingInfos)}`);
+  let needCheckFilesDiv = $("#needCheckFiles");
+  processingInfos.forEach(processingInfo => {
+    if (processingInfo.needCheck) {
+      let divTag = $('div[data-fileName="' + processingInfo.fileName + '"]');
+      divTag.css("border", "1px solid red");
+      let inputTag = getNeedCheckFileInputTag(processingInfo.fileName);
+      inputTag.appendTo(needCheckFilesDiv);
+    }
+  });
+}
+
+function getNeedCheckFileInputTag(fileName) {
+  let inputTag = $(document.createElement("input"));
+  inputTag.attr("type", "button");
+  inputTag.attr("value", fileName);
+  inputTag.css("border", "1px solid red");
+  return inputTag;
+}
+
+function validate(files, cb) {
   async.map(
     files,
     (file, asyncCb) => {
       //#region add json
       displayForAceLogFile(file);
       //#endregion
-
-      logValidator.validate(file);
+      logValidator.validate(file, asyncCb);
     },
     cb
   );
-}
-
-function validate1(file) {
-  //#region add json
-  displayForAceLogFile(file);
-  //#endregion
-
-  logValidator.validate(file, resultValidate => {
-    console.log(`${file.file}::${JSON.stringify(resultValidate)}`);
-  });
 }
 
 function displayForAceLogFile(file) {
@@ -343,6 +357,15 @@ function getDetailTag(summary, content) {
     .appendTo(detailsTag);
 
   return detailsTag;
+}
+
+function clearNeedCheckFilesChildView() {
+  const needCheckFiles = document.getElementById("needCheckFiles");
+  let firstChild = needCheckFiles.firstChild;
+  while (firstChild) {
+    needCheckFiles.removeChild(firstChild);
+    firstChild = needCheckFiles.firstChild;
+  }
 }
 //#endregion
 //#endregion
