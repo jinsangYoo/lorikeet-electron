@@ -72,6 +72,45 @@ function getSampleFolderPath() {
   return contents.join(path.sep).toString();
 }
 //#endregion
+
+//#region GUI
+var highlightElements = [];
+function addHighlightElements(fileName) {
+  if (!fileName) {
+    alert(`Sorry, we could not add highlight your ${fileName}.`);
+    return;
+  }
+
+  if (!highlightElements.includes(fileName)) {
+    highlightElements.push(fileName);
+
+    let divTag = $('div[data-fileName="' + fileName + '"]');
+    divTag.addClass("highlight");
+  } else {
+    removeAllHighlightElements();
+  }
+}
+
+function removeAllHighlightElements() {
+  highlightElements.forEach(fileName => {
+    removeHighlightElements(fileName);
+  });
+
+  highlightElements = [];
+}
+
+function removeHighlightElements(fileName) {
+  if (!fileName) {
+    alert(`Sorry, we could not remove highlight your ${fileName}.`);
+    return;
+  }
+
+  if (highlightElements.includes(fileName)) {
+    let divTag = $('div[data-fileName="' + fileName + '"]');
+    divTag.removeClass("highlight");
+  }
+}
+//#endregion
 //#endregion
 
 //#region GUI
@@ -134,6 +173,7 @@ function bindDocument(window) {
   document.getElementById("startBtn").addEventListener(
     "click",
     () => {
+      clearDebugMessagesChildView();
       clearNeedCheckFilesChildView();
       let currentFolderInnerText = document.getElementById("current-folder")
         .innerText;
@@ -307,12 +347,31 @@ function doneWhenValidate(err, processingInfos) {
   let needCheckFilesDiv = $("#needCheckFiles");
   processingInfos.forEach(processingInfo => {
     if (processingInfo.needCheck) {
-      let divTag = $('div[data-fileName="' + processingInfo.fileName + '"]');
-      divTag.css("border", "1px solid red");
       let inputTag = getNeedCheckFileInputTag(processingInfo.fileName);
+      inputTag.click(function(event) {
+        removeAllHighlightElements();
+        addHighlightElements(processingInfo.fileName);
+
+        clearDebugMessagesChildView();
+        let jPreTag = getPreTag(
+          processingInfo.debugMessages,
+          "debugMessagesPre"
+        );
+        jPreTag.appendTo($("#debugMessages"));
+      });
       inputTag.appendTo(needCheckFilesDiv);
     }
   });
+}
+
+function getPreTag(content, cssClassName) {
+  let preTag = document.createElement("pre");
+  let jPreTag = $(preTag);
+  if (cssClassName) {
+    jPreTag.addClass(cssClassName);
+  }
+  jPreTag.text(JSON.stringify(content, undefined, 2));
+  return jPreTag;
 }
 
 function getNeedCheckFileInputTag(fileName) {
@@ -345,16 +404,14 @@ function displayForAceLogFile(file) {
 function getDetailTag(summary, content) {
   let detailsTag = $(document.createElement("details"));
   let summaryTag = document.createElement("summary");
-  let preTag = document.createElement("pre");
+  let jPreTag = getPreTag(content);
 
   detailsTag.css("border", "1px solid rgba(139, 233, 62, 0.466)");
-  detailsTag.css("background", "rgba(216, 228, 53, 0.2)");
+  detailsTag.css("background", "rgb(245, 230, 111)");
   $(summaryTag)
     .text(summary)
     .appendTo(detailsTag);
-  $(preTag)
-    .text(JSON.stringify(content, undefined, 2))
-    .appendTo(detailsTag);
+  jPreTag.appendTo(detailsTag);
 
   return detailsTag;
 }
@@ -365,6 +422,14 @@ function clearNeedCheckFilesChildView() {
   while (firstChild) {
     needCheckFiles.removeChild(firstChild);
     firstChild = needCheckFiles.firstChild;
+  }
+}
+function clearDebugMessagesChildView() {
+  const debugMessages = document.getElementById("debugMessages");
+  let firstChild = debugMessages.firstChild;
+  while (firstChild) {
+    debugMessages.removeChild(firstChild);
+    firstChild = debugMessages.firstChild;
   }
 }
 //#endregion

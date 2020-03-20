@@ -3,6 +3,15 @@ body {
   margin: 0;
   font-family: "Helvetica", "Arial", "sans";
 }
+pre {
+  white-space: pre-wrap;
+}
+.debugMessagesPre {
+  border: 1px solid rgba(61, 133, 242, 0.584);
+  background: rgba(242, 171, 66, 0.495);
+  min-width: 100px;
+  min-height: 100px;
+}
 #toolbar {
   top: 0px;
   position: fixed;
@@ -88,11 +97,15 @@ body {
   margin: 5em 2em;
   z-index: 1;
 }
+.highlight {
+  border: 1px solid red;
+}
 .item {
   position: relative;
   float: left;
   width: 50em;
   text-align: left;
+  background: rgb(255, 255, 255);
 }
 .item .filename {
   padding: 0.5em;
