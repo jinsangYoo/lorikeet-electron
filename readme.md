@@ -7,7 +7,7 @@
 1. [npm 다운로드](https://nodejs.org/en/)
 2. git 내려받기
 3. bash 실행
-4. `npm install -g electron` 실행해서 electron 설치
+4. `npm install -g electron` 실행해서 electron 설치(이미 설칙 되어 있는 경우 생략: `electron -v` 으로 확인)
 
 - 글로벌 설치가 싫은 경우 `npm install --save-dev electron` 으로 설치
 
