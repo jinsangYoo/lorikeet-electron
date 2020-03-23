@@ -5,26 +5,6 @@ const userInterface = require("./userInterface");
 
 var _hasJson;
 var resultValidate;
-function start(folderPath, cb) {
-  console.log(`folderPath: ${folderPath}`);
-  _hasJson = false;
-  resultValidate = {
-    common: {
-      hasNotJson: [],
-      parsingSequence: [],
-      needCheckFiles: []
-    }
-  };
-
-  fileSystem.getFilesInFolder(folderPath, (err, files) => {
-    // UI 업데이트 위치
-    if (err) {
-      return alert("Sorry, you could not load your folder.");
-    }
-    console.log(`files.length: ${files.length}`);
-    fileSystem.inspectAndAceLogFiles(folderPath, files, cb);
-  });
-}
 
 let validator = {
   //#region require common first
@@ -105,6 +85,7 @@ let validator = {
         debugMessages: []
       };
 
+      // StartTS, GetTS 값 검증
       let resultIsSameStartTsGetTs = startts.localeCompare(getts) == 0;
       if (resultIsSameStartTsGetTs) {
         processingInfo.needCheck = true;
@@ -113,6 +94,7 @@ let validator = {
         );
       }
 
+      // VK 값 검증
       let resultVK = isFirstVk(key, file.file, file.json.vk);
       if (resultVK) {
         processingInfo.needCheck = true;
@@ -127,13 +109,16 @@ let validator = {
   },
   //#endregion
 
-  hasLogSource: (file, key) => {
+  template: (file, key) => {
     if (!hasJson()) {
       return;
     }
     console.log(`start::${key}`);
+    // let startts = getStartTS(key, file.file, file.json.st);
+    // let starttsObject = resultValidate[startts];
+    // let processingInfo = starttsObject.processingInfo;
 
-    console.log(`done::${key}::file.json.logsource :: ${file.json.logsource}`);
+    console.log(`done::${key}::file.json:: ${file.json}`);
   },
 
   isCE: (file, key) => {
@@ -217,16 +202,6 @@ let validator = {
   //#endregion
 };
 
-//#region public method
-function validate(file, cb) {
-  Object.entries(validator).forEach(([key, value]) => value(file, key));
-
-  let startts = getStartTS("validate", file.file, file.json.st);
-  let starttsObject = resultValidate[startts];
-  cb(undefined, starttsObject.processingInfo);
-}
-//#endregion
-
 //#region Validator Helper
 function getGetTS(key, fileName, st) {
   let stSplit = st.split("|");
@@ -280,6 +255,37 @@ function isSiteInTp(key, fileName, tp) {
     console.log(`${key}::${fileName}::tp 문제가 있습니다.::${tp}`);
     return false;
   }
+}
+//#endregion
+
+//#region public method
+function start(folderPath, cb) {
+  console.log(`folderPath: ${folderPath}`);
+  _hasJson = false;
+  resultValidate = {
+    common: {
+      hasNotJson: [],
+      parsingSequence: [],
+      needCheckFiles: []
+    }
+  };
+
+  fileSystem.getFilesInFolder(folderPath, (err, files) => {
+    // UI 업데이트 위치
+    if (err) {
+      return alert("Sorry, you could not load your folder.");
+    }
+    console.log(`files.length: ${files.length}`);
+    fileSystem.inspectAndAceLogFiles(folderPath, files, cb);
+  });
+}
+
+function validate(file, cb) {
+  Object.entries(validator).forEach(([key, value]) => value(file, key));
+
+  let startts = getStartTS("validate", file.file, file.json.st);
+  let starttsObject = resultValidate[startts];
+  cb(undefined, starttsObject.processingInfo);
 }
 //#endregion
 
