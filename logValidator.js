@@ -136,6 +136,25 @@ let validator = {
     console.log(`done::${key}::file.json.logsource :: ${file.json.logsource}`);
   },
 
+  isCE: (file, key) => {
+    if (!hasJson()) {
+      return;
+    }
+    console.log(`start::${key}`);
+    let startts = getStartTS(key, file.file, file.json.st);
+    let starttsObject = resultValidate[startts];
+    let processingInfo = starttsObject.processingInfo;
+
+    if (file.json.ce.localeCompare("1") != 0) {
+      processingInfo.needCheck = true;
+      processingInfo.debugMessages.push(
+        `ce 값 확인 필요. >>ce: ${file.json.ce}<<`
+      );
+    }
+
+    console.log(`done::${key}::file.json.logsource :: ${file.json.logsource}`);
+  },
+
   isValidRef: (file, key) => {
     if (!hasJson()) {
       return;
